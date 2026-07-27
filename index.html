@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2C5F2D">
+    <meta name="description" content="Gestión integral del hogar: calendario sincronizado, control de gastos, alertas de mantenimiento y documentos familiares">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://haroldco45.github.io/hogar-integral/">
+    <meta property="og:title" content="Hogar Integral • Control Total del Hogar">
+    <meta property="og:description" content="Una solución completa para gestionar el hogar: calendario familiar, gastos compartidos, mantenimiento y documentos importantes. Funciona offline.">
+    <meta property="og:image" content="https://haroldco45.github.io/hogar-integral/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://haroldco45.github.io/hogar-integral/">
+    <meta property="twitter:title" content="Hogar Integral • Control Total del Hogar">
+    <meta property="twitter:description" content="Gestiona el hogar de forma inteligente: calendario, gastos, mantenimiento y documentos">
+    <meta property="twitter:image" content="https://haroldco45.github.io/hogar-integral/og-image.png">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232C5F2D' width='192' height='192'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='80' font-weight='bold' fill='%23fff' font-family='system-ui'>HI</text></svg>">
+    
+    <title>Hogar Integral | Gestión del Hogar Familiar</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2C5F2D;
+            --primary-light: #4A8F4D;
+            --primary-dark: #1F4620;
+            --accent: #E8A35D;
+            --danger: #D32F2F;
+            --warning: #F57C00;
+            --success: #388E3C;
+            --bg: #F5F5F5;
+            --surface: #FFFFFF;
+            --text: #212121;
+            --text-secondary: #757575;
+            --border: #E0E0E0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .icon-home {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn-install {
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-install:hover {
+            background: #D4923D;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(232,163,93,0.3);
+        }
+        
+        .btn-install.hidden {
+            display: none;
+        }
+        
+        nav {
+            background: white;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            overflow-x: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .nav-item {
+            flex: 1;
+            min-width: 120px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+            font-weight: 500;
+            user-select: none;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(44, 95, 45, 0.05);
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background-color: rgba(44, 95, 45, 0.03);
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+        
+        main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Botones generales */
+        .btn {
+            padding: 0.7rem 1.4rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(44, 95, 45, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+        
+        .btn-secondary:hover {
+            background: #D0D0D0;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #B71C1C;
+        }
+        
+        /* CALENDARIO */
+        .calendar-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .calendar-month {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .weekday {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 0.9rem;
+            background: white;
+        }
+        
+        .day:hover {
+            background: rgba(44, 95, 45, 0.05);
+            border-color: var(--primary);
+        }
+        
+        .day.other-month {
+            color: var(--text-secondary);
+            background: var(--bg);
+        }
+        
+        .day.today {
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+        }
+        
+        .day.has-events::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+        
+        .event-form {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 95, 45, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .events-list {
+            margin-top: 2rem;
+        }
+        
+        .event-item {
+            background: white;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+        
+        .event-item.alerta {
+            border-left-color: var(--danger);
+        }
+        
+        .event-item.recordatorio {
+            border-left-color: var(--warning);
+        }
+        
+        .event-content {
+            flex: 1;
+        }
+        
+        .event-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+        
+        .event-date {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .event-type {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            margin-top: 0.4rem;
+            font-weight: 600;
+        }
+        
+        .event-type.alerta {
+            background: var(--danger);
+        }
+        
+        .event-type.recordatorio {
+            background: var(--warning);
+        }
+        
+        /* GASTOS */
+        .gastos-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .gasto-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .gasto-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .gasto-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .gasto-currency {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .form-gasto {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .gastos-list {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .gasto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .gasto-item:last-child {
+            border-bottom: none;
+        }
+        
+        .gasto-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .gasto-concepto {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+        
+        .gasto-fecha {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .gasto-categoria {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            background: rgba(44, 95, 45, 0.1);
+            color: var(--primary);
+            border-radius: 4px;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        .gasto-valor {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .gasto-valor.ingreso {
+            color: var(--success);
+        }
+        
+        .gasto-valor.egreso {
+            color: var(--danger);
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+        
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, rgba(44, 95, 45, 0.1) 0%, rgba(232, 163, 93, 0.1) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        /* MANTENIMIENTO */
+        .mantenimiento-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .mantenimiento-list {
+            list-style: none;
+        }
+        
+        .mantenimiento-item {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 1rem;
+        }
+        
+        .mantenimiento-item.urgente {
+            border-left-color: var(--danger);
+            background: rgba(211, 47, 47, 0.05);
+        }
+        
+        .mantenimiento-content {
+            flex: 1;
+        }
+        
+        .mantenimiento-name {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.4rem;
+            font-size: 1.05rem;
+        }
+        
+        .mantenimiento-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+        
+        .mantenimiento-frequency {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        
+        .mantenimiento-frequency.urgente {
+            background: var(--danger);
+        }
+        
+        .mantenimiento-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        /* DOCUMENTOS */
+        .documentos-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .documento-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .documento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .documento-icon {
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+        
+        .documento-content {
+            padding: 1.5rem;
+        }
+        
+        .documento-name {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+        }
+        
+        .documento-type {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            background: rgba(44, 95, 45, 0.1);
+            color: var(--primary);
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .documento-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        
+        .documento-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .add-documento {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+            font-size: 0.9rem;
+        }
+        
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        .btn-close:hover {
+            color: var(--text);
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .alert.success {
+            background: rgba(56, 142, 60, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert.error {
+            background: rgba(211, 47, 47, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header-title h1 {
+                font-size: 1.5rem;
+            }
+            
+            main {
+                padding: 1rem;
+            }
+            
+            nav {
+                gap: 0;
+            }
+            
+            .nav-item {
+                min-width: 100px;
+                padding: 0.8rem 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .gastos-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .documentos-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .gasto-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <div class="icon-home">🏠</div>
+                <h1>Hogar Integral</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn-install" id="installBtn" title="Instalar como aplicación">📥 Instalar</button>
+            </div>
+        </header>
+        
+        <nav>
+            <div class="nav-item active" data-section="calendario">
+                <span class="nav-icon">📅</span>
+                <span>Calendario</span>
+            </div>
+            <div class="nav-item" data-section="gastos">
+                <span class="nav-icon">💰</span>
+                <span>Gastos</span>
+            </div>
+            <div class="nav-item" data-section="mantenimiento">
+                <span class="nav-icon">🔧</span>
+                <span>Mantenimiento</span>
+            </div>
+            <div class="nav-item" data-section="documentos">
+                <span class="nav-icon">📄</span>
+                <span>Documentos</span>
+            </div>
+        </nav>
+        
+        <main>
+            <!-- SECCIÓN CALENDARIO -->
+            <section id="calendario" class="section active">
+                <div class="section-title">📅 Calendario Familiar Sincronizado</div>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button class="btn btn-secondary btn-small" id="prevMonth">← Anterior</button>
+                            <div class="calendar-month" id="monthDisplay"></div>
+                            <button class="btn btn-secondary btn-small" id="nextMonth">Siguiente →</button>
+                        </div>
+                    </div>
+                    
+                    <div class="weekdays">
+                        <div class="weekday">Dom</div>
+                        <div class="weekday">Lun</div>
+                        <div class="weekday">Mar</div>
+                        <div class="weekday">Mié</div>
+                        <div class="weekday">Jue</div>
+                        <div class="weekday">Vie</div>
+                        <div class="weekday">Sab</div>
+                    </div>
+                    
+                    <div class="days" id="calendarDays"></div>
+                </div>
+                
+                <div class="event-form">
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--primary); font-size: 1.1rem;">Agregar Evento</strong>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" id="eventDate">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="eventTitle" placeholder="Ej: Cita médica">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="eventType">
+                                <option value="evento">Evento</option>
+                                <option value="recordatorio">Recordatorio</option>
+                                <option value="alerta">Alerta</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción (opcional)</label>
+                        <textarea id="eventDescription" rows="2" placeholder="Detalles adicionales..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="addEventBtn">Agregar Evento</button>
+                </div>
+                
+                <div class="events-list" id="eventsList"></div>
+            </section>
+            
+            <!-- SECCIÓN GASTOS -->
+            <section id="gastos" class="section">
+                <div class="section-title">💰 Control de Gastos Familiares</div>
+                
+                <div class="gastos-container">
+                    <div class="gasto-card">
+                        <div class="gasto-title">Ingresos</div>
+                        <div class="gasto-amount" id="totalIngresos">$0</div>
+                        <div class="gasto-currency">Este mes</div>
+                    </div>
+                    <div class="gasto-card">
+                        <div class="gasto-title">Egresos</div>
+                        <div class="gasto-amount" id="totalEgresos" style="color: var(--danger);">$0</div>
+                        <div class="gasto-currency">Este mes</div>
+                    </div>
+                </div>
+                
+                <div class="form-gasto">
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--primary); font-size: 1.1rem;">Registrar Movimiento</strong>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="date" id="gastoFecha">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="gastoTipo">
+                                <option value="ingreso">Ingreso</option>
+                                <option value="egreso">Egreso</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select id="gastoCategoria">
+                                <option value="servicios">Servicios</option>
+                                <option value="alimentos">Alimentos</option>
+                                <option value="salud">Salud</option>
+                                <option value="educacion">Educación</option>
+                                <option value="transporte">Transporte</option>
+                                <option value="entretenimiento">Entretenimiento</option>
+                                <option value="vivienda">Vivienda</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Concepto</label>
+                            <input type="text" id="gastoConcepto" placeholder="Ej: Pago de teléfono">
+                        </div>
+                        <div class="form-group">
+                            <label>Monto (COP)</label>
+                            <input type="number" id="gastoMonto" placeholder="0" min="0">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="addGastoBtn">Registrar</button>
+                </div>
+                
+                <div class="gastos-list" id="gastosList"></div>
+                
+                <div class="chart-container">
+                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 1rem;">Resumen por Categoría</div>
+                    <div id="chartResumen"></div>
+                </div>
+            </section>
+            
+            <!-- SECCIÓN MANTENIMIENTO -->
+            <section id="mantenimiento" class="section">
+                <div class="section-title">🔧 Alertas de Mantenimiento</div>
+                
+                <div class="mantenimiento-container">
+                    <div style="margin-bottom: 2rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <strong style="color: var(--primary); font-size: 1.1rem;">Agregar Tarea de Mantenimiento</strong>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre de la Tarea</label>
+                                <input type="text" id="mantenimientoNombre" placeholder="Ej: Limpieza filtro A/C">
+                            </div>
+                            <div class="form-group">
+                                <label>Próxima Fecha</label>
+                                <input type="date" id="mantenimientoFecha">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Frecuencia</label>
+                                <select id="mantenimientoFrecuencia">
+                                    <option value="semanal">Semanal</option>
+                                    <option value="mensual">Mensual</option>
+                                    <option value="trimestral">Trimestral</option>
+                                    <option value="semestral">Semestral</option>
+                                    <option value="anual">Anual</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Responsable</label>
+                                <input type="text" id="mantenimientoResponsable" placeholder="Nombre">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="addMantenimientoBtn">Agregar Tarea</button>
+                    </div>
+                    
+                    <ul class="mantenimiento-list" id="mantenimientoList"></ul>
+                </div>
+            </section>
+            
+            <!-- SECCIÓN DOCUMENTOS -->
+            <section id="documentos" class="section">
+                <div class="section-title">📄 Documentos Familiares Importantes</div>
+                
+                <div class="add-documento">
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--primary); font-size: 1.1rem;">Registrar Documento</strong>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">Los documentos deben guardarse en Google Drive, OneDrive o Dropbox. Aquí puedes registrar su ubicación y detalles.</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre del Documento</label>
+                            <input type="text" id="documentoNombre" placeholder="Ej: Escritura Casa">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="documentoTipo">
+                                <option value="escritura">Escritura</option>
+                                <option value="contrato">Contrato</option>
+                                <option value="factura">Factura/Garantía</option>
+                                <option value="identidad">Documento Identidad</option>
+                                <option value="salud">Salud/Vacunas</option>
+                                <option value="seguro">Seguro</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Ubicación en la Nube</label>
+                        <input type="text" id="documentoUbicacion" placeholder="Ej: Google Drive > Documentos > Casa">
+                    </div>
+                    <div class="form-group">
+                        <label>Notas (opcional)</label>
+                        <textarea id="documentoNotas" rows="2" placeholder="Detalles, vencimiento, etc..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" id="addDocumentoBtn">Guardar Documento</button>
+                </div>
+                
+                <div class="documentos-container" id="documentosList"></div>
+            </section>
+        </main>
+        
+        <footer>
+            <div style="margin-bottom: 0.5rem;">
+                <strong>Hogar Integral</strong> • Solución completa para la gestión del hogar
+            </div>
+            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.8);">
+                Desarrollada por <strong>Vibras Positivas HM</strong> — Derechos de Autor Reservados
+            </div>
+            <div style="font-size: 0.8rem; margin-top: 0.5rem; color: rgba(255,255,255,0.7);">
+                🏠 Funciona sin conexión • ☁️ Tus datos en tu dispositivo
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // ============ PWA REGISTRATION ============
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript;base64,aW1wb3J0YXJlID0gW3NlbGY6aW5zdGFsbCc7c2VsZi5hZGRFdmVudExpc3RlbmVyKCdhY3RpdmF0ZScsIGV2ZW50ID0+IHtjb25zb2xlLmxvZygnU2VydmljZSBXb3JrZXIgYWN0aXZlIScpO30pO3NlbGYuYWRkRXZlbnRMaXN0ZW5lcignZmV0Y2gnLCBmdW5jdGlvbihldmVudCkgeyBpZiAoZXZlbnQucmVxdWVzdC5tZXRob2QgPT09ICdHRVQnKSB7IGV2ZW50LnJlc3BvbmRXaXRoKGNhY2hlcy5tYXRjaCggZXZlbnQucmVxdWVzdCApIC50aGVuKHJlcyA9PiByZXMgfHwgZmV0Y2goZXZlbnQucmVxdWVzdCkpKTsgfSB9KTs=')
+                .catch(err => console.log('SW error:', err));
+        }
+        
+        // ============ INSTALL BUTTON ============
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden');
+        });
+        
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response: ${outcome}`);
+                deferredPrompt = null;
+                installBtn.classList.add('hidden');
+            }
+        });
+        
+        // ============ NAVIGATION ============
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                
+                item.classList.add('active');
+                const sectionId = item.dataset.section;
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+        
+        // ============ STORAGE HELPERS ============
+        const storage = {
+            getEvents: () => JSON.parse(localStorage.getItem('hogar_events') || '[]'),
+            saveEvents: (events) => localStorage.setItem('hogar_events', JSON.stringify(events)),
+            getGastos: () => JSON.parse(localStorage.getItem('hogar_gastos') || '[]'),
+            saveGastos: (gastos) => localStorage.setItem('hogar_gastos', JSON.stringify(gastos)),
+            getMantenimiento: () => JSON.parse(localStorage.getItem('hogar_mantenimiento') || '[]'),
+            saveMantenimiento: (items) => localStorage.setItem('hogar_mantenimiento', JSON.stringify(items)),
+            getDocumentos: () => JSON.parse(localStorage.getItem('hogar_documentos') || '[]'),
+            saveDocumentos: (docs) => localStorage.setItem('hogar_documentos', JSON.stringify(docs))
+        };
+        
+        // ============ CALENDARIO ============
+        let currentDate = new Date();
+        
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const today = new Date();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+            
+            document.getElementById('monthDisplay').textContent = 
+                currentDate.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+            
+            const daysContainer = document.getElementById('calendarDays');
+            daysContainer.innerHTML = '';
+            
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'day other-month';
+                emptyDay.textContent = '';
+                daysContainer.appendChild(emptyDay);
+            }
+            
+            const events = storage.getEvents();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'day';
+                dayEl.textContent = day;
+                
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayEvents = events.filter(e => e.date === dateStr);
+                
+                if (dayEvents.length > 0) {
+                    dayEl.classList.add('has-events');
+                }
+                
+                if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
+                    dayEl.classList.add('today');
+                }
+                
+                dayEl.addEventListener('click', () => {
+                    document.getElementById('eventDate').value = dateStr;
+                    document.getElementById('eventTitle').focus();
+                });
+                
+                daysContainer.appendChild(dayEl);
+            }
+        }
+        
+        function renderEventsList() {
+            const events = storage.getEvents().sort((a, b) => new Date(b.date) - new Date(a.date));
+            const container = document.getElementById('eventsList');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No hay eventos. ¡Agrega uno!</p>';
+                return;
+            }
+            
+            container.innerHTML = events.map((e, i) => `
+                <div class="event-item ${e.type}">
+                    <div class="event-content">
+                        <div class="event-title">${e.title}</div>
+                        <div class="event-date">${new Date(e.date).toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        ${e.description ? `<div style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-secondary);">${e.description}</div>` : ''}
+                        <span class="event-type ${e.type}">${e.type.charAt(0).toUpperCase() + e.type.slice(1)}</span>
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="deleteEvent(${i})">Eliminar</button>
+                </div>
+            `).join('');
+        }
+        
+        function deleteEvent(index) {
+            const events = storage.getEvents();
+            events.splice(index, 1);
+            storage.saveEvents(events);
+            renderCalendar();
+            renderEventsList();
+        }
+        
+        document.getElementById('addEventBtn').addEventListener('click', () => {
+            const date = document.getElementById('eventDate').value;
+            const title = document.getElementById('eventTitle').value;
+            const type = document.getElementById('eventType').value;
+            const description = document.getElementById('eventDescription').value;
+            
+            if (!date || !title) {
+                alert('Por favor completa fecha y título');
+                return;
+            }
+            
+            const events = storage.getEvents();
+            events.push({ date, title, type, description });
+            storage.saveEvents(events);
+            
+            document.getElementById('eventDate').value = '';
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventDescription').value = '';
+            
+            renderCalendar();
+            renderEventsList();
+        });
+        
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+        
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+        
+        // ============ GASTOS ============
+        function renderGastos() {
+            const gastos = storage.getGastos().sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            const container = document.getElementById('gastosList');
+            
+            const ingresos = gastos.filter(g => g.tipo === 'ingreso').reduce((sum, g) => sum + g.monto, 0);
+            const egresos = gastos.filter(g => g.tipo === 'egreso').reduce((sum, g) => sum + g.monto, 0);
+            
+            document.getElementById('totalIngresos').textContent = '$' + ingresos.toLocaleString('es-CO');
+            document.getElementById('totalEgresos').textContent = '$' + egresos.toLocaleString('es-CO');
+            
+            if (gastos.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No hay movimientos. ¡Agrega uno!</p>';
+                renderChartResumen(gastos);
+                return;
+            }
+            
+            container.innerHTML = gastos.map((g, i) => `
+                <div class="gasto-item">
+                    <div class="gasto-info">
+                        <div class="gasto-concepto">${g.concepto}</div>
+                        <div class="gasto-fecha">${new Date(g.fecha).toLocaleDateString('es-CO')}</div>
+                        <span class="gasto-categoria">${g.categoria}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="gasto-valor ${g.tipo}">${g.tipo === 'ingreso' ? '+' : '-'}$${g.monto.toLocaleString('es-CO')}</div>
+                        <button class="btn btn-danger btn-small" onclick="deleteGasto(${i})">X</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            renderChartResumen(gastos);
+        }
+        
+        function renderChartResumen(gastos) {
+            const container = document.getElementById('chartResumen');
+            const categorias = {};
+            
+            gastos.forEach(g => {
+                if (!categorias[g.categoria]) categorias[g.categoria] = 0;
+                categorias[g.categoria] += g.monto;
+            });
+            
+            const items = Object.entries(categorias)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 6);
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Agrega gastos para ver el resumen</p>';
+                return;
+            }
+            
+            const maxValue = Math.max(...items.map(i => i[1]));
+            container.innerHTML = items.map(([cat, valor]) => `
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                        <span><strong>${cat}</strong></span>
+                        <span>$${valor.toLocaleString('es-CO')}</span>
+                    </div>
+                    <div style="width: 100%; height: 20px; background: var(--border); border-radius: 4px; overflow: hidden;">
+                        <div style="height: 100%; width: ${(valor / maxValue) * 100}%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); transition: width 0.3s;"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function deleteGasto(index) {
+            const gastos = storage.getGastos();
+            gastos.splice(index, 1);
+            storage.saveGastos(gastos);
+            renderGastos();
+        }
+        
+        document.getElementById('addGastoBtn').addEventListener('click', () => {
+            const fecha = document.getElementById('gastoFecha').value;
+            const tipo = document.getElementById('gastoTipo').value;
+            const categoria = document.getElementById('gastoCategoria').value;
+            const concepto = document.getElementById('gastoConcepto').value;
+            const monto = parseInt(document.getElementById('gastoMonto').value) || 0;
+            
+            if (!fecha || !concepto || monto === 0) {
+                alert('Por favor completa los campos requeridos');
+                return;
+            }
+            
+            const gastos = storage.getGastos();
+            gastos.push({ fecha, tipo, categoria, concepto, monto });
+            storage.saveGastos(gastos);
+            
+            document.getElementById('gastoFecha').value = '';
+            document.getElementById('gastoConcepto').value = '';
+            document.getElementById('gastoMonto').value = '';
+            
+            renderGastos();
+        });
+        
+        // ============ MANTENIMIENTO ============
+        function renderMantenimiento() {
+            const items = storage.getMantenimiento().sort((a, b) => new Date(a.proxima_fecha) - new Date(b.proxima_fecha));
+            const container = document.getElementById('mantenimientoList');
+            
+            if (items.length === 0) {
+                container.innerHTML = '<li style="text-align: center; color: var(--text-secondary); padding: 2rem;">No hay tareas de mantenimiento. ¡Agrega una!</li>';
+                return;
+            }
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            container.innerHTML = items.map((item, i) => {
+                const proxima = new Date(item.proxima_fecha);
+                proxima.setHours(0, 0, 0, 0);
+                const isUrgente = proxima <= today;
+                
+                return `
+                    <li class="mantenimiento-item ${isUrgente ? 'urgente' : ''}">
+                        <div class="mantenimiento-content">
+                            <div class="mantenimiento-name">${item.nombre}</div>
+                            <div class="mantenimiento-info">
+                                📅 ${proxima.toLocaleDateString('es-CO')}
+                                ${item.responsable ? ` • 👤 ${item.responsable}` : ''}
+                            </div>
+                            <span class="mantenimiento-frequency ${isUrgente ? 'urgente' : ''}">${item.frecuencia}</span>
+                            ${isUrgente ? '<span style="color: var(--danger); font-weight: 600; margin-left: 0.5rem;">⚠️ Vencida</span>' : ''}
+                        </div>
+                        <div class="mantenimiento-actions">
+                            <button class="btn btn-primary btn-small" onclick="completarMantenimiento(${i})">✓ Hecho</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteMantenimiento(${i})">Eliminar</button>
+                        </div>
+                    </li>
+                `;
+            }).join('');
+        }
+        
+        function completarMantenimiento(index) {
+            const items = storage.getMantenimiento();
+            const item = items[index];
+            
+            const proxima = new Date(item.proxima_fecha);
+            if (item.frecuencia === 'semanal') proxima.setDate(proxima.getDate() + 7);
+            else if (item.frecuencia === 'mensual') proxima.setMonth(proxima.getMonth() + 1);
+            else if (item.frecuencia === 'trimestral') proxima.setMonth(proxima.getMonth() + 3);
+            else if (item.frecuencia === 'semestral') proxima.setMonth(proxima.getMonth() + 6);
+            else if (item.frecuencia === 'anual') proxima.setFullYear(proxima.getFullYear() + 1);
+            
+            item.proxima_fecha = proxima.toISOString().split('T')[0];
+            items[index] = item;
+            storage.saveMantenimiento(items);
+            renderMantenimiento();
+        }
+        
+        function deleteMantenimiento(index) {
+            const items = storage.getMantenimiento();
+            items.splice(index, 1);
+            storage.saveMantenimiento(items);
+            renderMantenimiento();
+        }
+        
+        document.getElementById('addMantenimientoBtn').addEventListener('click', () => {
+            const nombre = document.getElementById('mantenimientoNombre').value;
+            const proxima_fecha = document.getElementById('mantenimientoFecha').value;
+            const frecuencia = document.getElementById('mantenimientoFrecuencia').value;
+            const responsable = document.getElementById('mantenimientoResponsable').value;
+            
+            if (!nombre || !proxima_fecha) {
+                alert('Por favor completa los campos requeridos');
+                return;
+            }
+            
+            const items = storage.getMantenimiento();
+            items.push({ nombre, proxima_fecha, frecuencia, responsable });
+            storage.saveMantenimiento(items);
+            
+            document.getElementById('mantenimientoNombre').value = '';
+            document.getElementById('mantenimientoFecha').value = '';
+            document.getElementById('mantenimientoResponsable').value = '';
+            
+            renderMantenimiento();
+        });
+        
+        // ============ DOCUMENTOS ============
+        const iconos = {
+            'escritura': '🏠',
+            'contrato': '📋',
+            'factura': '💳',
+            'identidad': '🪪',
+            'salud': '⚕️',
+            'seguro': '🛡️',
+            'otro': '📎'
+        };
+        
+        function renderDocumentos() {
+            const docs = storage.getDocumentos();
+            const container = document.getElementById('documentosList');
+            
+            if (docs.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No hay documentos registrados. ¡Agrega uno!</p>';
+                return;
+            }
+            
+            container.innerHTML = docs.map((doc, i) => `
+                <div class="documento-card">
+                    <div class="documento-icon">${iconos[doc.tipo] || '📄'}</div>
+                    <div class="documento-content">
+                        <div class="documento-name">${doc.nombre}</div>
+                        <span class="documento-type">${doc.tipo}</span>
+                        <div class="documento-info">
+                            <strong>📍 Ubicación:</strong><br>
+                            ${doc.ubicacion}
+                            ${doc.notas ? `<br><br><strong>📝 Notas:</strong><br>${doc.notas}` : ''}
+                        </div>
+                        <div class="documento-actions">
+                            <button class="btn btn-primary btn-small" onclick="copyToClipboard('${doc.ubicacion}')">📋 Copiar ruta</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteDocumento(${i})">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Ubicación copiada al portapapeles');
+            });
+        }
+        
+        function deleteDocumento(index) {
+            const docs = storage.getDocumentos();
+            docs.splice(index, 1);
+            storage.saveDocumentos(docs);
+            renderDocumentos();
+        }
+        
+        document.getElementById('addDocumentoBtn').addEventListener('click', () => {
+            const nombre = document.getElementById('documentoNombre').value;
+            const tipo = document.getElementById('documentoTipo').value;
+            const ubicacion = document.getElementById('documentoUbicacion').value;
+            const notas = document.getElementById('documentoNotas').value;
+            
+            if (!nombre || !ubicacion) {
+                alert('Por favor completa nombre y ubicación');
+                return;
+            }
+            
+            const docs = storage.getDocumentos();
+            docs.push({ nombre, tipo, ubicacion, notas });
+            storage.saveDocumentos(docs);
+            
+            document.getElementById('documentoNombre').value = '';
+            document.getElementById('documentoUbicacion').value = '';
+            document.getElementById('documentoNotas').value = '';
+            
+            renderDocumentos();
+        });
+        
+        // ============ INITIALIZATION ============
+        function setDefaultDate() {
+            const today = new Date();
+            document.getElementById('eventDate').valueAsDate = today;
+            document.getElementById('gastoFecha').valueAsDate = today;
+            document.getElementById('mantenimientoFecha').valueAsDate = today;
+        }
+        
+        setDefaultDate();
+        renderCalendar();
+        renderEventsList();
+        renderGastos();
+        renderMantenimiento();
+        renderDocumentos();
+    </script>
+</body>
+</html>
